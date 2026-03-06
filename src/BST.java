@@ -51,7 +51,7 @@ public class BST<I extends Comparable<I>, T> {
          * Returns a string representation of the node, indicating its index and data.
          */
         public String toString() {
-            return "index:\t" + this.index + ",\tdata: " + this.data + "\n";
+            return "index:\t" + this.index + ",\tdata:\t" + this.data + "\n";
         }
     }
 
