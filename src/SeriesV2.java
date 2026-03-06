@@ -32,7 +32,7 @@ public class SeriesV2<T> implements Series<T> {
                 if (finalRowName == null || finalRowName.length() == 0) {
                     finalRowName = String.valueOf(this.seriesData.getLength());
                 }
-                this.seriesData.appendNode(_rowNames[i], _data[i]);
+                this.seriesData.appendNode(finalRowName, _data[i]);
                 this.seriesDataBST.addNode(finalRowName, _data[i]);
             }
         } catch (NullPointerException e) {
@@ -66,7 +66,7 @@ public class SeriesV2<T> implements Series<T> {
             finalRowName = String.valueOf(this.seriesData.getLength());
         }
 
-        this.seriesData.appendNode(rn, d);
+        this.seriesData.appendNode(finalRowName, d);
         this.seriesDataBST.addNode(finalRowName, d);
     }
 
