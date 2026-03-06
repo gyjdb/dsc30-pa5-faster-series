@@ -73,7 +73,7 @@ public class LL<T> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("print the linked list ...\n");
+        sb.append("print the series ...\n");
         sb.append("==================\n");
         LLNode curr = this.head;
         while (curr != null) {
