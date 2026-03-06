@@ -1,4 +1,4 @@
-public class BST<I, T>{
+public class BST<I extends Comparable<I>, T> {
 
     class BSTNode {
         private I index;
@@ -10,45 +10,48 @@ public class BST<I, T>{
          * Default constructor. Sets all instance variables to be null.
          */
         public BSTNode() {
-            // TODO
+            this.index = null;
+            this.data = null;
+            this.left = null;
+            this.right = null;
         }
 
         /**
          * Constructor. Sets data and index to be _data and _index respectively.
          */
         public BSTNode(I _index, T _data) {
-            // TODO
+            this.index = _index;
+            this.data = _data;
+            this.left = null;
+            this.right = null;
         }
 
         /**
          * Returns the index stored in this node.
          */
         public I getIndex() {
-            // TODO
-            return null;
+            return this.index;
         }
 
         /**
          * Returns the data stored in this node.
          */
         public T getData() {
-            // TODO
-            return null;
+            return this.data;
         }
 
         /**
          * Updates the data in this node to the specified value.
          */
         public void setData(T d) {
-            // TODO
+            this.data = d;
         }
 
         /**
          * Returns a string representation of the node, indicating its index and data.
          */
         public String toString() {
-            // TODO
-            return null;
+            return "index: " + this.index + ", data: " + this.data + "\n";
         }
     }
 
@@ -60,7 +63,8 @@ public class BST<I, T>{
      * Constructor. Initializes an empty BST with root set to null and size set to 0.
      */
     public BST() {
-        // TODO
+        this.root = null;
+        this.size = 0;
     }
 
 
@@ -68,38 +72,82 @@ public class BST<I, T>{
      * Performs an in-order traversal of the BST and records indices and data values.
      */
     private String inOrderTraversal(BSTNode node) {
-        // TODO
-        return null;
+        if (node == null) {
+            return "";
+        }
+
+        return inOrderTraversal(node.left) + node.toString() + inOrderTraversal(node.right);
     }
 
     /**
      * Returns a string representation of the entire BST using in-order traversal.
      */
     public String toString() {
-        // TODO
-        return null;
+        return "In-order Traversal of the BST ...\n==================\n" + inOrderTraversal(this.root);
     }
 
     /**
      * Returns the size of the BST, i.e., the number of valid nodes.
      */
     public int getSize() {
-        // TODO
-        return 0;
+        return this.size;
     }
 
     /**
      * Adds a new node with the specified index and data to the BST.
      */
     public void addNode(I _index, T _data) {
-        // TODO
+        BSTNode newNode = new BSTNode(_index, _data);
+
+        if (this.root == null) {
+            this.root = newNode;
+            this.size++;
+            return;
+        }
+
+        BSTNode curr = this.root;
+        BSTNode parent = null;
+
+        while (curr != null) {
+            parent = curr;
+            int cmp = _index.compareTo(curr.getIndex());
+
+            if (cmp < 0) {
+                curr = curr.left;
+            } else if (cmp > 0) {
+                curr = curr.right;
+            } else {
+                return;
+            }
+        }
+
+        if (_index.compareTo(parent.getIndex()) < 0) {
+            parent.left = newNode;
+        } else {
+            parent.right = newNode;
+        }
+
+        this.size++;
     }
 
     /**
      * Searches for a node with the specified index in the BST.
      */
     public BSTNode searchNode(I _index) {
-        // TODO
+        BSTNode curr = this.root;
+
+        while (curr != null) {
+            int cmp = _index.compareTo(curr.getIndex());
+
+            if (cmp == 0) {
+                return curr;
+            } else if (cmp < 0) {
+                curr = curr.left;
+            } else {
+                curr = curr.right;
+            }
+        }
+
         return null;
     }
 
@@ -107,17 +155,74 @@ public class BST<I, T>{
      * Removes a node with the specified index from the BST.
      */
     public void removeNode(I _index) {
-        // TODO
+        BSTNode parent = null;
+        BSTNode curr = this.root;
+
+        while (curr != null && _index.compareTo(curr.getIndex()) != 0) {
+            parent = curr;
+            if (_index.compareTo(curr.getIndex()) < 0) {
+                curr = curr.left;
+            } else {
+                curr = curr.right;
+            }
+        }
+
+        if (curr == null) {
+            throw new IllegalArgumentException(
+                    "removeNode(I _index): No node with an index " + _index + " in the BST"
+            );
+        }
+
+        if (curr.left != null && curr.right != null) {
+            BSTNode succParent = curr;
+            BSTNode succ = curr.right;
+
+            while (succ.left != null) {
+                succParent = succ;
+                succ = succ.left;
+            }
+
+            curr.index = succ.index;
+            curr.data = succ.data;
+
+            parent = succParent;
+            curr = succ;
+        }
+
+        BSTNode child;
+        if (curr.left != null) {
+            child = curr.left;
+        } else {
+            child = curr.right;
+        }
+
+        if (parent == null) {
+            this.root = child;
+        } else if (parent.left == curr) {
+            parent.left = child;
+        } else {
+            parent.right = child;
+        }
+
+        this.size--;
     }
 
     /**
      * Updates a node's data with a new value, given its index.
      */
     public void updateNode(I _index, T _newData) {
-        // TODO
+        BSTNode target = searchNode(_index);
+
+        if (target == null) {
+            throw new IllegalArgumentException(
+                    "updateNode(I _index, T _newData): No node with an index " + _index + " in the BST"
+            );
+        }
+
+        target.setData(_newData);
     }
 
-    
+
 /************************************ GRADING CODE (DO NOT MODIFY) ************************************ */
     /**
      * Performs a pre-order traversal of the BST.
@@ -132,7 +237,7 @@ public class BST<I, T>{
         else
             arr[idx[0]] = String.valueOf(node.getIndex());
         idx[0]++;
-        
+
         preOrderTraversal(node.left, idx, arr, dataFlag);
         preOrderTraversal(node.right, idx, arr, dataFlag);
     }
