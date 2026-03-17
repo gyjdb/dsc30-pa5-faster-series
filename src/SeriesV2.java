@@ -2,6 +2,31 @@ public class SeriesV2<T> implements Series<T> {
     private LL<T> seriesData;
     private BST<String, T> seriesDataBST;
 
+    private String resolveRowName(String rn) {
+        if (rn != null && rn.length() > 0) {
+            return rn;
+        }
+
+        int candidate = this.seriesData.getLength();
+        String generatedName = String.valueOf(candidate);
+        while (this.seriesDataBST.searchNode(generatedName) != null) {
+            candidate++;
+            generatedName = String.valueOf(candidate);
+        }
+        return generatedName;
+    }
+
+    private void appendSynchronized(String rowName, T data) {
+        if (this.seriesDataBST.searchNode(rowName) != null) {
+            throw new IllegalArgumentException(
+                    "append(String rn, T d): rn already exists"
+            );
+        }
+
+        this.seriesData.appendNode(rowName, data);
+        this.seriesDataBST.addNode(rowName, data);
+    }
+
     public SeriesV2(String[] _rowNames, T[] _data) {
         this.seriesData = new LL<T>();
         this.seriesDataBST = new BST<String, T>();
@@ -28,18 +53,13 @@ public class SeriesV2<T> implements Series<T> {
             }
 
             for (int i = 0; i < _data.length; i++) {
-                String finalRowName = _rowNames[i];
-                if (finalRowName == null || finalRowName.length() == 0) {
-                    finalRowName = String.valueOf(this.seriesData.getLength());
-                }
-                this.seriesData.appendNode(_rowNames[i], _data[i]);
-                this.seriesDataBST.addNode(finalRowName, _data[i]);
+                String finalRowName = resolveRowName(_rowNames[i]);
+                appendSynchronized(finalRowName, _data[i]);
             }
         } catch (NullPointerException e) {
             for (int i = 0; i < _data.length; i++) {
-                String finalRowName = String.valueOf(i);
-                this.seriesData.appendNode(finalRowName, _data[i]);
-                this.seriesDataBST.addNode(finalRowName, _data[i]);
+                String finalRowName = resolveRowName(null);
+                appendSynchronized(finalRowName, _data[i]);
             }
         }
     }
@@ -61,13 +81,8 @@ public class SeriesV2<T> implements Series<T> {
     }
 
     public void append(String rn, T d) {
-        String finalRowName = rn;
-        if (finalRowName == null || finalRowName.length() == 0) {
-            finalRowName = String.valueOf(this.seriesData.getLength());
-        }
-
-        this.seriesData.appendNode(rn, d);
-        this.seriesDataBST.addNode(finalRowName, d);
+        String finalRowName = resolveRowName(rn);
+        appendSynchronized(finalRowName, d);
     }
 
     public T loc(String rn) throws NullPointerException, IllegalArgumentException {
